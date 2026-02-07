@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+model User {
+  id                String   @id @default(uuid())
+
+  // ✅ Login uchun email majburiy
+  email             String   @unique
+  passwordHash      String
+
+  // ✅ Model talablaringizdagi ism/familya
+  firstName         String
+  lastName          String
+
+  // ✅ Studentda age bo‘ladi, adminda null bo‘lishi mumkin
+  age               Int?
+
+  // ✅ Student va admin uchun rasm yo‘li (uploads/...).
+  imagePath         String?
+
+  role              Role     @default(STUDENT)
+
+  // ✅ Refresh token’ni DB’da hash ko‘rinishida saqlaymiz (xavfsizroq)
+  refreshTokenHash  String?
+
+  // ✅ Forgot/Reset password uchun kod va vaqt
+  resetCodeHash     String?
+  resetCodeExp      DateTime?
+
+  // ✅ Delete account uchun 5 xonali kod
+  deleteCodeHash    String?
+  deleteCodeExp     DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
