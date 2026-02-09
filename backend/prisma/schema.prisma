@@ -26,10 +26,13 @@ model User {
   // ✅ Studentda age bo‘ladi, adminda null bo‘lishi mumkin
   age               Int?
 
-  // ✅ Student va admin uchun rasm yo‘li (uploads/...).
+
   imagePath         String?
 
   role              Role     @default(STUDENT)
+
+   // ✅ Google login uchun
+  googleSub        String?  @unique  // Google user unique id (sub)
 
   // ✅ Refresh token’ni DB’da hash ko‘rinishida saqlaymiz (xavfsizroq)
   refreshTokenHash  String?
@@ -44,4 +47,11 @@ model User {
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+
+  // signin da Login Attempt Lock (5x xato → 15 min) 5 marta xato loginparol tersa 15 minutga bloklanadi
+  failedLoginCount Int      @default(0)
+  lockUntil        DateTime?
+
+
 }

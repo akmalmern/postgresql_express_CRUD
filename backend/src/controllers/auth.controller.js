@@ -6,7 +6,11 @@ const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 const { mapZodIssues } = require("../middlewares/errorHandler");
 
-const { signAccessToken, signRefreshToken } = require("../utils/tokens");
+const {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefresh,
+} = require("../utils/tokens");
 const { sendMail } = require("../utils/sendMail");
 const { generateNumericCode } = require("../utils/codes");
 
@@ -17,6 +21,8 @@ const {
   resetSchema,
 } = require("../validators/auth.schema");
 
+const { verifyGoogleIdToken } = require("../utils/google");
+
 const cookieOptions = {
   httpOnly: true,
   sameSite: "lax",
@@ -24,15 +30,94 @@ const cookieOptions = {
   path: "/",
 };
 
+exports.googleAuth = asyncHandler(async (req, res) => {
+  const { idToken } = req.body;
+
+  if (!idToken) {
+    throw new AppError("idToken yuborilmadi", 400, {
+      code: "ID_TOKEN_REQUIRED",
+    });
+  }
+
+  // ✅ 1) Google tokenni tekshiramiz
+  const payload = await verifyGoogleIdToken(idToken);
+
+  const email = payload.email.trim().toLowerCase();
+  const googleSub = payload.sub;
+
+  // ✅ (ixtiyoriy) name parsing
+  const fullName = (payload.name || "").trim();
+  const [firstNameRaw, ...rest] = fullName.split(" ");
+  const firstName = firstNameRaw || "User";
+  const lastName = rest.join(" ") || "Google";
+
+  // ✅ 2) Userni topamiz (googleSub bo‘yicha eng to‘g‘ri)
+  let user = await prisma.user.findUnique({ where: { googleSub } });
+
+  // ✅ 3) Agar googleSub bo‘yicha topilmasa, email bo‘yicha tekshiramiz
+  // (email bir xil bo‘lsa accountlarni “link” qilamiz)
+  if (!user) {
+    const byEmail = await prisma.user.findUnique({ where: { email } });
+
+    if (byEmail) {
+      // email mavjud => shu accountga googleSub bog‘laymiz
+      user = await prisma.user.update({
+        where: { id: byEmail.id },
+        data: { googleSub },
+      });
+    } else {
+      // yangi user yaratamiz
+      user = await prisma.user.create({
+        data: {
+          email,
+          passwordHash: null, // ✅ google user
+          firstName,
+          lastName,
+          age: null,
+          imagePath: null, // avatarni keyin yuklaydi (sizda shunday)
+          role: "STUDENT",
+          googleSub,
+        },
+      });
+    }
+  }
+
+  // ✅ 4) Bizning tokenlarimizni beramiz (sizning tizim)
+  const accessToken = signAccessToken({ sub: user.id, role: user.role });
+  const refreshToken = signRefreshToken({ sub: user.id, role: user.role });
+
+  const refreshTokenHash = crypto
+    .createHash("sha256")
+    .update(refreshToken)
+    .digest("hex");
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { refreshTokenHash },
+  });
+
+  res.cookie("refreshToken", refreshToken, {
+    ...cookieOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.json({
+    success: true,
+    message: "Google orqali kirish muvaffaqiyatli",
+    accessToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      imagePath: user.imagePath,
+    },
+  });
+});
+
 exports.studentSignup = asyncHandler(async (req, res) => {
   const parsed = studentSignupSchema.safeParse(req.body);
   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
-
-  if (!req.file) {
-    throw new AppError("Student uchun rasm majburiy", 400, {
-      code: "IMAGE_REQUIRED",
-    });
-  }
 
   const { email, password, firstName, lastName, age } = parsed.data;
 
@@ -51,7 +136,7 @@ exports.studentSignup = asyncHandler(async (req, res) => {
       firstName,
       lastName,
       age,
-      imagePath: `uploads/${req.file.filename}`,
+      imagePath: null,
       role: "STUDENT",
     },
     select: {
@@ -59,7 +144,6 @@ exports.studentSignup = asyncHandler(async (req, res) => {
       email: true,
       firstName: true,
       lastName: true,
-
       role: true,
     },
   });
@@ -67,26 +151,120 @@ exports.studentSignup = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, message: "Student yaratildi", user });
 });
 
+// exports.signin = asyncHandler(async (req, res) => {
+//   const parsed = signinSchema.safeParse(req.body);
+//   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
+
+//   const { email, password } = parsed.data;
+
+//   const user = await prisma.user.findUnique({ where: { email } });
+
+//   // ✅ enumeration: doim bir xil javob
+//   if (!user)
+//     throw new AppError("Email yoki parol noto‘g‘ri", 401, {
+//       code: "INVALID_CREDENTIALS",
+//     });
+
+//   const ok = await bcrypt.compare(password, user.passwordHash);
+//   if (!ok)
+//     throw new AppError("Email yoki parol noto‘g‘ri", 401, {
+//       code: "INVALID_CREDENTIALS",
+//     });
+
+//   const accessToken = signAccessToken({ sub: user.id, role: user.role });
+//   const refreshToken = signRefreshToken({ sub: user.id, role: user.role });
+
+//   const refreshTokenHash = crypto
+//     .createHash("sha256")
+//     .update(refreshToken)
+//     .digest("hex");
+//   await prisma.user.update({
+//     where: { id: user.id },
+//     data: { refreshTokenHash },
+//   });
+
+//   res.cookie("refreshToken", refreshToken, {
+//     ...cookieOptions,
+//     maxAge: 7 * 24 * 60 * 60 * 1000,
+//   });
+
+//   res.json({
+//     success: true,
+//     message: "Kirish muvaffaqiyatli",
+//     accessToken,
+//     user: {
+//       id: user.id,
+//       email: user.email,
+//       firstName: user.firstName,
+//       lastName: user.lastName,
+//       role: user.role,
+//       imagePath: user.imagePath,
+//     },
+//   });
+// });
+
+const MAX_FAILED = 5;
+const LOCK_MINUTES = 15;
+
 exports.signin = asyncHandler(async (req, res) => {
   const parsed = signinSchema.safeParse(req.body);
   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
 
-  const { email, password } = parsed.data;
+  // ✅ emailni normalizatsiya qilish (pro)
+  const email = parsed.data.email.trim().toLowerCase();
+  const { password } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { email } });
 
-  // ✅ enumeration: doim bir xil javob
-  if (!user)
+  // ✅ enumeration: user yo‘q bo‘lsa ham bir xil
+  if (!user) {
     throw new AppError("Email yoki parol noto‘g‘ri", 401, {
       code: "INVALID_CREDENTIALS",
     });
+  }
+
+  // ✅ lock tekshirish
+  if (user.lockUntil && user.lockUntil.getTime() > Date.now()) {
+    throw new AppError(
+      `Account vaqtincha bloklangan. ${LOCK_MINUTES} daqiqadan keyin urinib ko‘ring.`,
+      403,
+      { code: "ACCOUNT_LOCKED" },
+    );
+  }
 
   const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok)
+
+  // ❌ Parol xato bo‘lsa: failed count + lock
+  if (!ok) {
+    const nextFailed = (user.failedLoginCount || 0) + 1;
+
+    // ✅ limitga yetdimi?
+    const shouldLock = nextFailed >= MAX_FAILED;
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginCount: shouldLock ? 0 : nextFailed, // lock bo‘lsa 0ga qaytarib qo‘yamiz
+        lockUntil: shouldLock
+          ? new Date(Date.now() + LOCK_MINUTES * 60 * 1000)
+          : null,
+      },
+    });
+
     throw new AppError("Email yoki parol noto‘g‘ri", 401, {
       code: "INVALID_CREDENTIALS",
     });
+  }
 
+  // ✅ login muvaffaqiyatli: failed reset + lock clear
+  if (user.failedLoginCount || user.lockUntil) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { failedLoginCount: 0, lockUntil: null },
+    });
+  }
+
+  // ✅ tokenlar
   const accessToken = signAccessToken({ sub: user.id, role: user.role });
   const refreshToken = signRefreshToken({ sub: user.id, role: user.role });
 

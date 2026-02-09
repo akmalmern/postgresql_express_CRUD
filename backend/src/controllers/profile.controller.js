@@ -8,6 +8,7 @@ const { mapZodIssues } = require("../middlewares/errorHandler");
 const { safeUnlink } = require("../utils/file");
 const { sendMail } = require("../utils/sendMail");
 const { generateNumericCode } = require("../utils/codes");
+const pickDefined = require("../utils/pickDefined");
 
 const {
   updateProfileSchema,
@@ -50,21 +51,19 @@ exports.updateProfile = asyncHandler(async (req, res) => {
   const parsed = updateProfileSchema.safeParse(req.body);
   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
 
-  const existing = await prisma.user.findUnique({ where: { id: userId } });
-  if (!existing)
-    throw new AppError("User topilmadi", 404, { code: "NOT_FOUND" });
+  // ✅ faqat yuborilgan fieldlarni olamiz
+  const data = pickDefined(parsed.data);
 
-  const data = { ...parsed.data };
-
-  // ✅ rasm kelsa eski rasm diskdan o‘chadi
-  if (req.file) {
-    safeUnlink(existing.imagePath);
-    data.imagePath = `uploads/${req.file.filename}`;
+  // ✅ hech narsa yuborilmasa
+  if (Object.keys(data).length === 0) {
+    throw new AppError("Yangilash uchun hech qanday field yuborilmadi", 400, {
+      code: "NO_FIELDS_TO_UPDATE",
+    });
   }
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data,
+    data, // ✅ faqat kiritilganlar update bo‘ladi
     select: {
       id: true,
       email: true,
@@ -76,7 +75,110 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     },
   });
 
-  res.json({ success: true, message: "Profil yangilandi", user });
+  res.json({ success: true, message: "Profil (text) yangilandi", user });
+});
+
+exports.updateAvatar = asyncHandler(async (req, res) => {
+  const userId = req.user.sub;
+
+  if (!req.file) {
+    throw new AppError("Avatar rasmi yuborilmadi", 400, {
+      code: "IMAGE_REQUIRED",
+    });
+  }
+
+  const newPath = `uploads/${req.file.filename}`;
+
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, imagePath: true },
+  });
+
+  if (!existing) {
+    safeUnlink(newPath); // ✅ user yo‘q bo‘lsa ham yangi faylni o‘chir
+    throw new AppError("User topilmadi", 404, { code: "NOT_FOUND" });
+  }
+
+  try {
+    // ✅ 1) avval DB update
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { imagePath: newPath },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        age: true,
+        imagePath: true,
+        role: true,
+      },
+    });
+
+    // ✅ 2) DB muvaffaqiyatli bo‘lgach eski faylni o‘chir
+    if (existing.imagePath) safeUnlink(existing.imagePath);
+
+    return res.json({
+      success: true,
+      message: "Avatar yangilandi",
+      user: updated,
+    });
+  } catch (err) {
+    // ✅ DB update fail => yangi upload faylni ham o‘chir
+    safeUnlink(newPath);
+    throw err;
+  }
+});
+
+exports.deleteAvatar = asyncHandler(async (req, res) => {
+  const userId = req.user.sub;
+
+  // ✅ Avval mavjud user + imagePath ni olamiz
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, imagePath: true },
+  });
+
+  if (!existing) {
+    throw new AppError("User topilmadi", 404, { code: "NOT_FOUND" });
+  }
+
+  // ✅ Avatari yo‘q bo‘lsa ham, idempotent qilamiz (delete qayta bosilsa ham ok)
+  if (!existing.imagePath) {
+    return res.json({
+      success: true,
+      message: "Avatar allaqachon o‘chirilgan",
+      user: { id: existing.id, imagePath: null },
+    });
+  }
+
+  // ✅ (ixtiyoriy) Agar default avatar path saqlayotgan bo‘lsangiz, uni o‘chirmaymiz
+  // Masalan default: "uploads/default.png" bo‘lsa:
+  // if (existing.imagePath === "uploads/default.png") { ... }
+
+  // ✅ 1) Avval DB update (imagePath null)
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { imagePath: null },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      age: true,
+      imagePath: true,
+      role: true,
+    },
+  });
+
+  // ✅ 2) Keyin diskdan eski faylni o‘chiramiz
+  safeUnlink(existing.imagePath);
+
+  res.json({
+    success: true,
+    message: "Avatar o‘chirildi",
+    user: updated,
+  });
 });
 
 // ✅ 1) Delete code yuborish (5 xonali)
