@@ -4,11 +4,13 @@ const crypto = require("crypto");
 const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 const { mapZodIssues } = require("../middlewares/errorHandler");
+const { ok } = require("../utils/respond");
 
 const { safeUnlink } = require("../utils/file");
 const { sendMail } = require("../utils/sendMail");
 const { generateNumericCode } = require("../utils/codes");
 const pickDefined = require("../utils/pickDefined");
+const { getCookieOptions } = require("../utils/cookies");
 
 const {
   updateProfileSchema,
@@ -16,12 +18,7 @@ const {
   confirmDeleteSchema,
 } = require("../validators/profile.schema");
 
-const cookieOptions = {
-  httpOnly: true,
-  sameSite: "lax",
-  secure: false,
-  path: "/",
-};
+const cookieOptions = getCookieOptions();
 
 exports.getProfile = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
@@ -40,9 +37,9 @@ exports.getProfile = asyncHandler(async (req, res) => {
     },
   });
 
-  if (!user) throw new AppError("User topilmadi", 404, { code: "NOT_FOUND" });
+  if (!user) throw new AppError("NOT_FOUND", 404, { code: "NOT_FOUND" });
 
-  res.json({ success: true, user });
+  return ok(req, res, { user });
 });
 
 exports.updateProfile = asyncHandler(async (req, res) => {
@@ -51,19 +48,17 @@ exports.updateProfile = asyncHandler(async (req, res) => {
   const parsed = updateProfileSchema.safeParse(req.body);
   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
 
-  // ✅ faqat yuborilgan fieldlarni olamiz
   const data = pickDefined(parsed.data);
 
-  // ✅ hech narsa yuborilmasa
   if (Object.keys(data).length === 0) {
-    throw new AppError("Yangilash uchun hech qanday field yuborilmadi", 400, {
+    throw new AppError("NO_FIELDS_TO_UPDATE", 400, {
       code: "NO_FIELDS_TO_UPDATE",
     });
   }
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data, // ✅ faqat kiritilganlar update bo‘ladi
+    data,
     select: {
       id: true,
       email: true,
@@ -75,16 +70,14 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     },
   });
 
-  res.json({ success: true, message: "Profil (text) yangilandi", user });
+  return ok(req, res, { user }, "PROFILE_UPDATED");
 });
 
 exports.updateAvatar = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
 
   if (!req.file) {
-    throw new AppError("Avatar rasmi yuborilmadi", 400, {
-      code: "IMAGE_REQUIRED",
-    });
+    throw new AppError("IMAGE_REQUIRED", 400, { code: "IMAGE_REQUIRED" });
   }
 
   const newPath = `uploads/${req.file.filename}`;
@@ -95,12 +88,11 @@ exports.updateAvatar = asyncHandler(async (req, res) => {
   });
 
   if (!existing) {
-    safeUnlink(newPath); // ✅ user yo‘q bo‘lsa ham yangi faylni o‘chir
-    throw new AppError("User topilmadi", 404, { code: "NOT_FOUND" });
+    safeUnlink(newPath);
+    throw new AppError("NOT_FOUND", 404, { code: "NOT_FOUND" });
   }
 
   try {
-    // ✅ 1) avval DB update
     const updated = await prisma.user.update({
       where: { id: userId },
       data: { imagePath: newPath },
@@ -115,16 +107,10 @@ exports.updateAvatar = asyncHandler(async (req, res) => {
       },
     });
 
-    // ✅ 2) DB muvaffaqiyatli bo‘lgach eski faylni o‘chir
     if (existing.imagePath) safeUnlink(existing.imagePath);
 
-    return res.json({
-      success: true,
-      message: "Avatar yangilandi",
-      user: updated,
-    });
+    return ok(req, res, { user: updated }, "AVATAR_UPDATED");
   } catch (err) {
-    // ✅ DB update fail => yangi upload faylni ham o‘chir
     safeUnlink(newPath);
     throw err;
   }
@@ -133,30 +119,22 @@ exports.updateAvatar = asyncHandler(async (req, res) => {
 exports.deleteAvatar = asyncHandler(async (req, res) => {
   const userId = req.user.sub;
 
-  // ✅ Avval mavjud user + imagePath ni olamiz
   const existing = await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true, imagePath: true },
   });
 
-  if (!existing) {
-    throw new AppError("User topilmadi", 404, { code: "NOT_FOUND" });
-  }
+  if (!existing) throw new AppError("NOT_FOUND", 404, { code: "NOT_FOUND" });
 
-  // ✅ Avatari yo‘q bo‘lsa ham, idempotent qilamiz (delete qayta bosilsa ham ok)
   if (!existing.imagePath) {
-    return res.json({
-      success: true,
-      message: "Avatar allaqachon o‘chirilgan",
-      user: { id: existing.id, imagePath: null },
-    });
+    return ok(
+      req,
+      res,
+      { user: { id: existing.id, imagePath: null } },
+      "AVATAR_ALREADY_DELETED",
+    );
   }
 
-  // ✅ (ixtiyoriy) Agar default avatar path saqlayotgan bo‘lsangiz, uni o‘chirmaymiz
-  // Masalan default: "uploads/default.png" bo‘lsa:
-  // if (existing.imagePath === "uploads/default.png") { ... }
-
-  // ✅ 1) Avval DB update (imagePath null)
   const updated = await prisma.user.update({
     where: { id: userId },
     data: { imagePath: null },
@@ -171,26 +149,20 @@ exports.deleteAvatar = asyncHandler(async (req, res) => {
     },
   });
 
-  // ✅ 2) Keyin diskdan eski faylni o‘chiramiz
   safeUnlink(existing.imagePath);
 
-  res.json({
-    success: true,
-    message: "Avatar o‘chirildi",
-    user: updated,
-  });
+  return ok(req, res, { user: updated }, "AVATAR_DELETED");
 });
 
-// ✅ 1) Delete code yuborish (5 xonali)
 exports.requestDeleteAccount = asyncHandler(async (req, res) => {
   const parsed = requestDeleteSchema.safeParse(req.body);
   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
 
-  const { email } = parsed.data;
+  const email = parsed.data.email.trim().toLowerCase();
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || user.id !== req.user.sub) {
-    throw new AppError("Email noto‘g‘ri", 400, { code: "INVALID_EMAIL" });
+    throw new AppError("INVALID_EMAIL", 400, { code: "INVALID_EMAIL" });
   }
 
   const code = generateNumericCode(5);
@@ -202,52 +174,55 @@ exports.requestDeleteAccount = asyncHandler(async (req, res) => {
     data: { deleteCodeHash: hash, deleteCodeExp: exp },
   });
 
+  // ⚠️ email template’ni 3 tilda qilgan bo‘lsangiz shu yerda chaqirasiz
+  // const { getEmailTemplate } = require("../utils/emailTemplates");
+  // const tpl = getEmailTemplate(req.lang, "deleteAccount", { code, minutes: 10 });
+
   await sendMail({
     to: email,
-    subject: "Account o‘chirish kodi",
+    subject: "Delete account code",
     html: `
-      <h3>Account o‘chirish</h3>
-      <p>5 xonali kodingiz: <b style="font-size:22px">${code}</b></p>
-      <p>Kod 10 daqiqa amal qiladi.</p>
+      <h3>Delete account</h3>
+      <p>Your 5-digit code: <b style="font-size:22px">${code}</b></p>
+      <p>Expires in 10 minutes.</p>
     `,
   });
 
-  res.json({ success: true, message: "Kod emailingizga yuborildi" });
+  return ok(req, res, {}, "DELETE_CODE_SENT");
 });
 
-// ✅ 2) Delete confirm
 exports.confirmDeleteAccount = asyncHandler(async (req, res) => {
   const parsed = confirmDeleteSchema.safeParse(req.body);
   if (!parsed.success) throw mapZodIssues(parsed.error.issues);
 
-  const { email, code } = parsed.data;
+  const email = parsed.data.email.trim().toLowerCase();
+  const { code } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || user.id !== req.user.sub) {
-    throw new AppError("Email yoki kod noto‘g‘ri", 400, {
+    throw new AppError("DELETE_REQUEST_INVALID", 400, {
       code: "INVALID_DELETE_REQUEST",
     });
   }
 
   if (!user.deleteCodeHash || !user.deleteCodeExp) {
-    throw new AppError("Avval delete kod so‘rang", 400, {
+    throw new AppError("DELETE_CODE_REQUIRED", 400, {
       code: "DELETE_CODE_REQUIRED",
     });
   }
 
   if (user.deleteCodeExp.getTime() < Date.now()) {
-    throw new AppError("Kod eskirgan", 400, { code: "CODE_EXPIRED" });
+    throw new AppError("DELETE_CODE_EXPIRED", 400, { code: "CODE_EXPIRED" });
   }
 
   const hash = crypto.createHash("sha256").update(code).digest("hex");
   if (hash !== user.deleteCodeHash) {
-    throw new AppError("Kod noto‘g‘ri", 400, { code: "INVALID_CODE" });
+    throw new AppError("DELETE_CODE_INVALID", 400, { code: "INVALID_CODE" });
   }
 
   safeUnlink(user.imagePath);
-
   await prisma.user.delete({ where: { id: user.id } });
 
   res.clearCookie("refreshToken", cookieOptions);
-  res.json({ success: true, message: "Account o‘chirildi" });
+  return ok(req, res, {}, "ACCOUNT_DELETED");
 });

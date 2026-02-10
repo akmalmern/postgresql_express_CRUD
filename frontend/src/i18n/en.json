@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "profile": "Profile",
+    "adminStudents": "Students",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "age": "Age",
+    "backToLogin": "Back to login",
+    "signupHelp": "Create a new account",
+    "haveAccount": "Already have an account?",
+    "loginHelp": "Enter your credentials to continue",
+    "forgot": {
+      "title": "Forgot password?",
+      "sendCode": "Send code",
+      "sending": "Sending..."
+    },
+    "reset": {
+      "title": "Reset password",
+      "codePlaceholder": "6-digit code",
+      "newPasswordPlaceholder": "New password",
+      "submit": "Update password",
+      "saving": "Saving...",
+      "resendCode": "Resend code"
+    },
+    "delete": {
+      "title": "Delete account",
+      "emailPlaceholder": "Your email",
+      "helpText": "We will send a 5-digit code to your email. Enter the code to delete your account.",
+      "sendCode": "Send delete code",
+      "sending": "Sending...",
+      "codePlaceholder": "5-digit code",
+      "confirm": "Confirm delete",
+      "deleting": "Deleting..."
+    }
+  },
+  "profile": {
+    "avatar": "Avatar",
+    "removeAvatar": "Remove avatar"
+  },
+  "common": {
+    "save": "Save",
+    "upload": "Upload",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "back": "Back"
+  }
+}

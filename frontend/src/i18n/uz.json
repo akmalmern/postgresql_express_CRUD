@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "profile": "Profil",
+    "adminStudents": "Studentlar",
+    "logout": "Chiqish"
+  },
+  "auth": {
+    "login": "Kirish",
+    "signup": "Ro'yxatdan o'tish",
+    "email": "Email",
+    "password": "Parol",
+    "firstName": "Ism",
+    "lastName": "Familiya",
+    "age": "Yosh",
+    "backToLogin": "Login sahifasiga qaytish",
+    "signupHelp": "Yangi account yarating",
+    "haveAccount": "Account bormi?",
+    "loginHelp": "Davom etish uchun ma'lumotlarni kiriting",
+    "forgot": {
+      "title": "Parolni unutdingizmi?",
+      "sendCode": "Kod yuborish",
+      "sending": "Yuborilmoqda..."
+    },
+    "reset": {
+      "title": "Parolni tiklash",
+      "codePlaceholder": "6 xonali kod",
+      "newPasswordPlaceholder": "Yangi parol",
+      "submit": "Parolni yangilash",
+      "saving": "Saqlanmoqda...",
+      "resendCode": "Kodni qayta yuborish"
+    },
+    "delete": {
+      "title": "Accountni o‘chirish",
+      "emailPlaceholder": "Emailingiz",
+      "helpText": "Emailingizga 5 xonali kod yuboramiz. Kodni kiritib accountni o‘chirasiz.",
+      "sendCode": "O‘chirish kodini yuborish",
+      "sending": "Yuborilmoqda...",
+      "codePlaceholder": "5 xonali kod",
+      "confirm": "O‘chirishni tasdiqlash",
+      "deleting": "O‘chirilmoqda..."
+    }
+  },
+  "profile": {
+    "avatar": "Profil rasmi",
+    "removeAvatar": "Avatarni o‘chirish"
+  },
+  "common": {
+    "save": "Saqlash",
+    "upload": "Yuklash",
+    "delete": "O'chirish",
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "back": "Orqaga"
+  }
+}

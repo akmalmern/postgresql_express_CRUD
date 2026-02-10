@@ -1,0 +1,64 @@
+{
+  "AUTH_INVALID_CREDENTIALS": "Invalid email or password",
+  "AUTH_NO_TOKEN": "Token is missing",
+  "AUTH_INVALID_TOKEN": "Token is invalid or expired",
+  "AUTH_NO_REFRESH_TOKEN": "Refresh token is missing",
+  "AUTH_INVALID_REFRESH_TOKEN": "Refresh token is invalid or expired",
+  "AUTH_SESSION_EXPIRED": "Session expired. Please sign in again.",
+  "AUTH_ACCOUNT_LOCKED": "Account is temporarily locked. Try again later.",
+
+  "USER_CREATED": "Student created",
+  "LOGIN_SUCCESS": "Signed in successfully",
+  "LOGOUT_SUCCESS": "Logged out",
+  "TOKEN_REFRESHED": "Token refreshed",
+
+  "EMAIL_EXISTS": "Email already exists",
+  "NOT_FOUND": "Not found",
+
+  "PASSWORD_RESET_SENT": "If the email exists, a code was sent",
+  "RESET_CODE_INVALID_OR_EXPIRED": "Code is invalid or expired",
+  "RESET_CODE_EXPIRED": "Code expired",
+  "RESET_CODE_INVALID": "Invalid code",
+  "PASSWORD_UPDATED_RELOGIN": "Password updated. Please sign in again.",
+
+  "PROFILE_UPDATED": "Profile updated",
+  "NO_FIELDS_TO_UPDATE": "No data provided for update",
+
+  "AVATAR_UPDATED": "Avatar updated",
+  "AVATAR_DELETED": "Avatar deleted",
+  "AVATAR_ALREADY_DELETED": "Avatar already deleted",
+  "IMAGE_REQUIRED": "Image is required",
+  "INVALID_FILE_TYPE": "Only JPG/PNG/WEBP allowed",
+  "FILE_TOO_LARGE": "File too large (max 2MB)",
+
+  "VALIDATION_ERROR": "Validation error",
+
+  "DELETE_CODE_SENT": "Code sent to your email",
+  "INVALID_EMAIL": "Invalid email",
+  "DELETE_CODE_REQUIRED": "Request delete code first",
+  "DELETE_REQUEST_INVALID": "Invalid email or code",
+  "ACCOUNT_DELETED": "Account deleted",
+
+  "FORBIDDEN": "Forbidden",
+  "UNAUTHORIZED": "Authentication required",
+  "CORS_NOT_ALLOWED": "CORS: Origin not allowed",
+
+  "RATE_LIMIT_SIGNIN": "Too many attempts. Please try again later.",
+  "RATE_LIMIT_FORGOT": "Too many attempts. Please try again later.",
+  "RATE_LIMIT_REFRESH": "Too many attempts. Please try again later.",
+  "RATE_LIMIT_DELETE_REQUEST": "Too many attempts. Please try again later.",
+
+  "INTERNAL_ERROR": "Internal server error",
+  "DB_ERROR": "Database error",
+  "DUPLICATE_VALUE": "Duplicate value",
+  "UPLOAD_ERROR": "Upload error",
+
+  "STUDENT_DELETED": "User deleted",
+
+  "AUTH_GOOGLE_ONLY": "This account is available only via Google login",
+  "AUTH_REFRESH_REUSE_DETECTED": "Session terminated for security reasons. Please log in again",
+  "AUTH_GOOGLE_SUCCESS": "Successfully logged in with Google",
+
+  "DELETE_CODE_EXPIRED": "Deletion code has expired",
+  "DELETE_CODE_INVALID": "Invalid deletion code"
+}

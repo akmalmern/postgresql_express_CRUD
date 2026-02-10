@@ -1,0 +1,64 @@
+{
+  "AUTH_INVALID_CREDENTIALS": "Неверный email или пароль",
+  "AUTH_NO_TOKEN": "Токен отсутствует",
+  "AUTH_INVALID_TOKEN": "Токен неверный или истёк",
+  "AUTH_NO_REFRESH_TOKEN": "Refresh-токен отсутствует",
+  "AUTH_INVALID_REFRESH_TOKEN": "Refresh-токен неверный или истёк",
+  "AUTH_SESSION_EXPIRED": "Сессия истекла. Войдите снова.",
+  "AUTH_ACCOUNT_LOCKED": "Аккаунт временно заблокирован. Попробуйте позже.",
+
+  "USER_CREATED": "Студент создан",
+  "LOGIN_SUCCESS": "Успешный вход",
+  "LOGOUT_SUCCESS": "Вы вышли из системы",
+  "TOKEN_REFRESHED": "Токен обновлён",
+
+  "EMAIL_EXISTS": "Этот email уже существует",
+  "NOT_FOUND": "Не найдено",
+
+  "PASSWORD_RESET_SENT": "Если email существует, код отправлен",
+  "RESET_CODE_INVALID_OR_EXPIRED": "Код неверный или истёк",
+  "RESET_CODE_EXPIRED": "Код истёк",
+  "RESET_CODE_INVALID": "Неверный код",
+  "PASSWORD_UPDATED_RELOGIN": "Пароль обновлён. Войдите снова.",
+
+  "PROFILE_UPDATED": "Профиль обновлён",
+  "NO_FIELDS_TO_UPDATE": "Нет данных для обновления",
+
+  "AVATAR_UPDATED": "Аватар обновлён",
+  "AVATAR_DELETED": "Аватар удалён",
+  "AVATAR_ALREADY_DELETED": "Аватар уже удалён",
+  "IMAGE_REQUIRED": "Изображение не отправлено",
+  "INVALID_FILE_TYPE": "Можно загрузить только JPG/PNG/WEBP",
+  "FILE_TOO_LARGE": "Файл слишком большой (макс 2MB)",
+
+  "VALIDATION_ERROR": "Ошибка валидации",
+
+  "DELETE_CODE_SENT": "Код отправлен на ваш email",
+  "INVALID_EMAIL": "Неверный email",
+  "DELETE_CODE_REQUIRED": "Сначала запросите код удаления",
+  "DELETE_REQUEST_INVALID": "Неверный email или код",
+  "ACCOUNT_DELETED": "Аккаунт удалён",
+
+  "FORBIDDEN": "Доступ запрещён",
+  "UNAUTHORIZED": "Требуется авторизация",
+  "CORS_NOT_ALLOWED": "CORS: Origin не разрешён",
+
+  "RATE_LIMIT_SIGNIN": "Слишком много попыток. Попробуйте позже.",
+  "RATE_LIMIT_FORGOT": "Слишком много попыток. Попробуйте позже.",
+  "RATE_LIMIT_REFRESH": "Слишком много попыток. Попробуйте позже.",
+  "RATE_LIMIT_DELETE_REQUEST": "Слишком много попыток. Попробуйте позже.",
+
+  "INTERNAL_ERROR": "Ошибка сервера",
+  "DB_ERROR": "Ошибка базы данных",
+  "DUPLICATE_VALUE": "Дублирующее значение",
+  "UPLOAD_ERROR": "Ошибка загрузки файла",
+
+  "STUDENT_DELETED": "Пользователь удалён",
+
+  "AUTH_GOOGLE_ONLY": "Этот аккаунт доступен только через вход с Google",
+  "AUTH_REFRESH_REUSE_DETECTED": "Сессия завершена из соображений безопасности. Пожалуйста, войдите снова",
+  "AUTH_GOOGLE_SUCCESS": "Успешный вход через Google",
+
+  "DELETE_CODE_EXPIRED": "Код удаления истёк",
+  "DELETE_CODE_INVALID": "Неверный код удаления"
+}

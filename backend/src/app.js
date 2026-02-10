@@ -13,8 +13,11 @@ const authRoutes = require("./routes/auth.routes");
 const profileRoutes = require("./routes/profile.routes");
 const adminRoutes = require("./routes/admin.routes");
 
+const language = require("./middlewares/language");
+
 const app = express();
 app.use(requestId);
+app.use(language);
 // ✅ Security headers
 app.use(helmet());
 

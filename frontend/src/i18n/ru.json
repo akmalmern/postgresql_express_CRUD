@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "profile": "Профиль",
+    "adminStudents": "Студенты",
+    "logout": "Выйти"
+  },
+  "auth": {
+    "login": "Вход",
+    "signup": "Регистрация",
+    "email": "Email",
+    "password": "Пароль",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "age": "Возраст",
+    "backToLogin": "Назад к входу",
+    "signupHelp": "Создайте новый аккаунт",
+    "haveAccount": "Уже есть аккаунт?",
+    "loginHelp": "Введите данные для входа",
+    "forgot": {
+      "title": "Забыли пароль?",
+      "sendCode": "Отправить код",
+      "sending": "Отправка..."
+    },
+    "reset": {
+      "title": "Сброс пароля",
+      "codePlaceholder": "6-значный код",
+      "newPasswordPlaceholder": "Новый пароль",
+      "submit": "Обновить пароль",
+      "saving": "Сохранение...",
+      "resendCode": "Отправить код снова"
+    },
+    "delete": {
+      "title": "Удаление аккаунта",
+      "emailPlaceholder": "Ваш email",
+      "helpText": "Мы отправим 5-значный код на ваш email. Введите код, чтобы удалить аккаунт.",
+      "sendCode": "Отправить код удаления",
+      "sending": "Отправка...",
+      "codePlaceholder": "5-значный код",
+      "confirm": "Подтвердить удаление",
+      "deleting": "Удаление..."
+    }
+  },
+  "profile": {
+    "avatar": "Аватар",
+    "removeAvatar": "Удалить аватар"
+  },
+  "common": {
+    "save": "Сохранить",
+    "upload": "Загрузить",
+    "delete": "Удалить",
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "back": "Назад"
+  }
+}

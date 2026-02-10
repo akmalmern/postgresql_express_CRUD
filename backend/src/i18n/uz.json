@@ -1,0 +1,64 @@
+{
+  "AUTH_INVALID_CREDENTIALS": "Email yoki parol noto‘g‘ri",
+  "AUTH_NO_TOKEN": "Token yo‘q",
+  "AUTH_INVALID_TOKEN": "Token noto‘g‘ri yoki eskirgan",
+  "AUTH_NO_REFRESH_TOKEN": "Refresh token yo‘q",
+  "AUTH_INVALID_REFRESH_TOKEN": "Refresh token noto‘g‘ri yoki eskirgan",
+  "AUTH_SESSION_EXPIRED": "Session tugagan. Qayta login qiling.",
+  "AUTH_ACCOUNT_LOCKED": "Account vaqtincha bloklangan. Birozdan keyin urinib ko‘ring.",
+
+  "USER_CREATED": "Student yaratildi",
+  "LOGIN_SUCCESS": "Kirish muvaffaqiyatli",
+  "LOGOUT_SUCCESS": "Logout bo‘ldi",
+  "TOKEN_REFRESHED": "Token yangilandi",
+
+  "EMAIL_EXISTS": "Bu email allaqachon mavjud",
+  "NOT_FOUND": "Topilmadi",
+
+  "PASSWORD_RESET_SENT": "Agar email mavjud bo‘lsa, kod yuborildi",
+  "RESET_CODE_INVALID_OR_EXPIRED": "Kod noto‘g‘ri yoki eskirgan",
+  "RESET_CODE_EXPIRED": "Kod eskirgan",
+  "RESET_CODE_INVALID": "Kod noto‘g‘ri",
+  "PASSWORD_UPDATED_RELOGIN": "Parol yangilandi. Qayta login qiling.",
+
+  "PROFILE_UPDATED": "Profil (text) yangilandi",
+  "NO_FIELDS_TO_UPDATE": "Yangilash uchun hech qanday field yuborilmadi",
+
+  "AVATAR_UPDATED": "Avatar yangilandi",
+  "AVATAR_DELETED": "Avatar o‘chirildi",
+  "AVATAR_ALREADY_DELETED": "Avatar allaqachon o‘chirilgan",
+  "IMAGE_REQUIRED": "Rasm yuborilmadi",
+  "INVALID_FILE_TYPE": "Faqat JPG/PNG/WEBP rasm yuklash mumkin",
+  "FILE_TOO_LARGE": "Rasm hajmi katta (max 2MB)",
+
+  "VALIDATION_ERROR": "Validation xato",
+
+  "DELETE_CODE_SENT": "Kod emailingizga yuborildi",
+  "INVALID_EMAIL": "Email noto‘g‘ri",
+  "DELETE_CODE_REQUIRED": "Avval delete kod so‘rang",
+  "DELETE_REQUEST_INVALID": "Email yoki kod noto‘g‘ri",
+  "ACCOUNT_DELETED": "Account o‘chirildi",
+
+  "FORBIDDEN": "Ruxsat yo‘q",
+  "UNAUTHORIZED": "Auth kerak",
+  "CORS_NOT_ALLOWED": "CORS: Origin ruxsat etilmagan",
+
+  "RATE_LIMIT_SIGNIN": "Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.",
+  "RATE_LIMIT_FORGOT": "Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.",
+  "RATE_LIMIT_REFRESH": "Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.",
+  "RATE_LIMIT_DELETE_REQUEST": "Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.",
+
+  "INTERNAL_ERROR": "Server xatosi",
+  "DB_ERROR": "Database xatosi",
+  "DUPLICATE_VALUE": "Duplicate qiymat",
+  "UPLOAD_ERROR": "File upload xatosi",
+
+  "STUDENT_DELETED": "User o'chirildi",
+
+  "AUTH_GOOGLE_ONLY": "Bu akkaunt faqat Google orqali kirish uchun mo‘ljallangan",
+  "AUTH_REFRESH_REUSE_DETECTED": "Xavfsizlik sababli sessiya bekor qilindi. Iltimos, qayta kiring",
+  "AUTH_GOOGLE_SUCCESS": "Google orqali muvaffaqiyatli kirildi",
+
+  "DELETE_CODE_EXPIRED": "O‘chirish kodi eskirgan",
+  "DELETE_CODE_INVALID": "O‘chirish kodi noto‘g‘ri"
+}

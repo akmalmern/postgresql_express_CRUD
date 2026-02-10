@@ -1,8 +1,8 @@
 const AppError = require("../utils/AppError");
 const { Prisma } = require("@prisma/client");
-
+const { t } = require("../utils/i18n");
 function mapZodIssues(issues) {
-  return new AppError("Validation xato", 400, {
+  return new AppError("VALIDATION_ERROR", 400, {
     code: "VALIDATION_ERROR",
     details: issues,
   });
@@ -68,7 +68,7 @@ function errorHandler(err, req, res, next) {
   res.status(appErr.statusCode).json({
     success: false,
     code: appErr.code,
-    message: appErr.message,
+    message: t(req.lang, appErr.message),
     requestId: req.requestId,
     ...(appErr.details ? { details: appErr.details } : {}),
     ...(!isProd ? { stack: err.stack } : {}),
