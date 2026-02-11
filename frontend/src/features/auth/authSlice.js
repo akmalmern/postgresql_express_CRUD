@@ -4,6 +4,7 @@
 //   logoutThunk,
 //   refreshThunk,
 //   getProfileThunk,
+//   googleAuthThunk,
 // } from "./authThunks";
 
 // const initialState = {
@@ -37,6 +38,12 @@
 //       localStorage.setItem("accessToken", action.payload.accessToken);
 //     });
 
+//     b.addCase(googleAuthThunk.fulfilled, (state, action) => {
+//       state.accessToken = action.payload.accessToken;
+//       state.user = action.payload.user;
+//       localStorage.setItem("accessToken", action.payload.accessToken);
+//     });
+
 //     b.addCase(logoutThunk.fulfilled, (state) => {
 //       state.accessToken = null;
 //       state.user = null;
@@ -56,6 +63,7 @@
 
 // export const { setAccessToken, setUser, clearAuth } = authSlice.actions;
 // export default authSlice.reducer;
+
 import { createSlice } from "@reduxjs/toolkit";
 import {
   signinThunk,
@@ -87,6 +95,7 @@ const authSlice = createSlice({
       state.accessToken = null;
       state.user = null;
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("hasSession"); // ✅
     },
   },
   extraReducers: (b) => {
@@ -94,23 +103,27 @@ const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.user = action.payload.user;
       localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("hasSession", "1"); // ✅
     });
 
     b.addCase(googleAuthThunk.fulfilled, (state, action) => {
       state.accessToken = action.payload.accessToken;
       state.user = action.payload.user;
       localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("hasSession", "1"); // ✅
     });
 
     b.addCase(logoutThunk.fulfilled, (state) => {
       state.accessToken = null;
       state.user = null;
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("hasSession"); // ✅
     });
 
     b.addCase(refreshThunk.fulfilled, (state, action) => {
       state.accessToken = action.payload.accessToken;
       localStorage.setItem("accessToken", action.payload.accessToken);
+      // hasSession qoladi (cookie bor deb turadi)
     });
 
     b.addCase(getProfileThunk.fulfilled, (state, action) => {

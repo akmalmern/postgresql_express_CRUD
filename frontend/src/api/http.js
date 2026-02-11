@@ -1,15 +1,23 @@
 // import axios from "axios";
-// import store from "../app/store";
-// import { clearAuth, setAccessToken } from "../features/auth/authSlice";
 
 // const http = axios.create({
 //   baseURL: import.meta.env.VITE_API_URL,
-//   withCredentials: true, // ✅ refresh cookie uchun shart
+//   withCredentials: true,
 // });
 
-// // ✅ Request: access token + x-lang
+// // ✅ tokenni localStorage’dan o‘qiymiz (store import yo‘q)
+// function getToken() {
+//   return localStorage.getItem("accessToken");
+// }
+
+// function setToken(token) {
+//   if (token) localStorage.setItem("accessToken", token);
+//   else localStorage.removeItem("accessToken");
+// }
+
+// // ✅ Request interceptor
 // http.interceptors.request.use((config) => {
-//   const token = store.getState().auth.accessToken;
+//   const token = getToken();
 //   if (token) config.headers.Authorization = `Bearer ${token}`;
 
 //   const lang = localStorage.getItem("lang") || "uz";
@@ -18,30 +26,41 @@
 //   return config;
 // });
 
-// // ✅ Response: 401 -> refresh -> retry
+// // ✅ Refresh queue (PRO: parallel 401 larni bitta refresh bilan hal qiladi)
+// let refreshingPromise = null;
+
 // http.interceptors.response.use(
 //   (res) => res,
 //   async (error) => {
 //     const original = error.config;
 
-//     if (error.response?.status === 401 && !original?._retry) {
+//     if (error?.response?.status === 401 && !original?._retry) {
 //       original._retry = true;
 
 //       try {
-//         const r = await axios.post(
-//           `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
-//           {},
-//           { withCredentials: true },
-//         );
+//         if (!refreshingPromise) {
+//           refreshingPromise = axios.post(
+//             `${import.meta.env.VITE_API_URL}/api/auth/refresh`,
+//             {},
+//             {
+//               withCredentials: true,
+//               headers: { "x-lang": localStorage.getItem("lang") || "uz" },
+//             },
+//           );
+//         }
+
+//         const r = await refreshingPromise;
+//         refreshingPromise = null;
 
 //         const newToken = r.data?.accessToken;
-//         if (!newToken) throw new Error("NO_ACCESS_TOKEN");
-
-//         store.dispatch(setAccessToken(newToken));
-//         original.headers.Authorization = `Bearer ${newToken}`;
-//         return http(original);
+//         if (newToken) {
+//           setToken(newToken);
+//           original.headers.Authorization = `Bearer ${newToken}`;
+//           return http(original);
+//         }
 //       } catch (e) {
-//         store.dispatch(clearAuth());
+//         refreshingPromise = null;
+//         setToken(null);
 //         return Promise.reject(e);
 //       }
 //     }
@@ -51,6 +70,7 @@
 // );
 
 // export default http;
+// export { setToken as setAccessToken };
 import axios from "axios";
 
 const http = axios.create({
@@ -58,7 +78,6 @@ const http = axios.create({
   withCredentials: true,
 });
 
-// ✅ tokenni localStorage’dan o‘qiymiz (store import yo‘q)
 function getToken() {
   return localStorage.getItem("accessToken");
 }
@@ -66,6 +85,11 @@ function getToken() {
 function setToken(token) {
   if (token) localStorage.setItem("accessToken", token);
   else localStorage.removeItem("accessToken");
+}
+
+function hasSession() {
+  // ✅ login bo‘lganda qo‘yiladigan flag
+  return localStorage.getItem("hasSession") === "1";
 }
 
 // ✅ Request interceptor
@@ -79,13 +103,23 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ Refresh queue (PRO: parallel 401 larni bitta refresh bilan hal qiladi)
+// ✅ Refresh queue
 let refreshingPromise = null;
 
 http.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
+
+    // ✅ refresh endpoint o‘zida bo‘lsa -> qayta refreshga urinmaymiz
+    if (original?.url?.includes("/api/auth/refresh")) {
+      return Promise.reject(error);
+    }
+
+    // ✅ session bo‘lmasa -> refresh qilishga urinmaymiz (401 spam yo‘q)
+    if (!hasSession()) {
+      return Promise.reject(error);
+    }
 
     if (error?.response?.status === 401 && !original?._retry) {
       original._retry = true;
@@ -111,8 +145,14 @@ http.interceptors.response.use(
           original.headers.Authorization = `Bearer ${newToken}`;
           return http(original);
         }
+
+        // token kelmasa -> session tugadi
+        localStorage.removeItem("hasSession");
+        setToken(null);
+        return Promise.reject(error);
       } catch (e) {
         refreshingPromise = null;
+        localStorage.removeItem("hasSession");
         setToken(null);
         return Promise.reject(e);
       }
