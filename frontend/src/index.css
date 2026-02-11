@@ -1,64 +1,51 @@
 @import "tailwindcss";
-@reference "tailwindcss";
 
+/* ✅ Custom component class’lar faqat @layer components ichida */
 @layer components {
   .page {
     @apply min-h-screen bg-gray-50 px-4 py-10;
   }
 
   .card {
-    @apply mx-auto w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5;
-  }
-
-  .title {
-    @apply text-xl font-semibold text-gray-900;
-  }
-
-  .muted {
-    @apply text-sm text-gray-500;
+    @apply rounded-2xl bg-white p-6 shadow-sm border border-gray-200;
   }
 
   .input {
-    @apply w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm
-      outline-none transition
-      focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30;
-  }
-
-  .btn-primary {
-    @apply inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium
-      bg-blue-600 text-white hover:bg-blue-700 transition
-      disabled:cursor-not-allowed disabled:opacity-60;
-  }
-
-  .btn-danger {
-    @apply inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium
-      bg-red-600 text-white hover:bg-red-700 transition
-      disabled:cursor-not-allowed disabled:opacity-60;
-  }
-
-  .btn-ghost {
-    @apply inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium
-      border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition
-      disabled:cursor-not-allowed disabled:opacity-60;
+    @apply w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm
+           outline-none transition
+           focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30;
   }
 
   .link {
-    @apply text-sm font-medium text-blue-600 hover:text-blue-700;
+    @apply text-blue-600 hover:text-blue-700 hover:underline;
+  }
+
+  .btn-base {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold
+           transition disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  /* ⚠️ Tailwind v4: @apply ichida custom class’ni (btn-base) chaqirmang
+     Shuning uchun btn-primary ichiga util’larni o‘zini yozamiz */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold
+           transition disabled:cursor-not-allowed disabled:opacity-60
+           bg-blue-600 text-white hover:bg-blue-700;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold
+           transition disabled:cursor-not-allowed disabled:opacity-60
+           border border-gray-300 bg-white text-gray-800 hover:bg-gray-100;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold
+           transition disabled:cursor-not-allowed disabled:opacity-60
+           bg-red-600 text-white hover:bg-red-700;
   }
 
   .section {
-    @apply rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5;
-  }
-
-  .table {
-    @apply w-full overflow-hidden rounded-xl border border-gray-200 bg-white;
-  }
-
-  .th {
-    @apply bg-gray-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-600;
-  }
-
-  .td {
-    @apply px-4 py-3 text-sm text-gray-800 border-t border-gray-200;
+    @apply rounded-2xl bg-white p-4 shadow-sm border border-gray-200;
   }
 }

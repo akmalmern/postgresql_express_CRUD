@@ -16,6 +16,11 @@
     "signupHelp": "Yangi account yarating",
     "haveAccount": "Account bormi?",
     "loginHelp": "Davom etish uchun ma'lumotlarni kiriting",
+    "or": "Yoki",
+    "google": {
+      "failed": "Google orqali kirish amalga oshmadi",
+      "noToken": "Google token kelmadi"
+    },
     "forgot": {
       "title": "Parolni unutdingizmi?",
       "sendCode": "Kod yuborish",

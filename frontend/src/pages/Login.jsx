@@ -1,58 +1,3 @@
-// import { useState } from "react";
-// import { useDispatch } from "react-redux";
-// import { signinThunk } from "../features/auth/authThunks";
-// import { toast } from "react-toastify";
-// import { useNavigate, Link } from "react-router-dom";
-// import { useTranslation } from "react-i18next";
-
-// export default function Login() {
-//   const { t } = useTranslation();
-//   const dispatch = useDispatch();
-//   const nav = useNavigate();
-
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-
-//   const submit = async (e) => {
-//     e.preventDefault();
-//     const r = await dispatch(signinThunk({ email, password }));
-
-//     if (signinThunk.fulfilled.match(r)) {
-//       toast.success(r.payload.message); // ✅ backend tarjima qilib beradi
-//       nav("/profile");
-//     } else {
-//       toast.error(r.payload?.message || "Error");
-//     }
-//   };
-
-//   return (
-//     <div style={{ maxWidth: 420, margin: "80px auto" }}>
-//       <h2>{t("auth.login")}</h2>
-
-//       <form onSubmit={submit} style={{ display: "grid", gap: 10 }}>
-//         <input
-//           placeholder={t("auth.email")}
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//         />
-//         <input
-//           placeholder={t("auth.password")}
-//           type="password"
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//         />
-//         <button type="submit">{t("auth.login")}</button>
-//       </form>
-
-//       <p style={{ marginTop: 12 }}>
-//         <Link to="/signup">{t("auth.signup")}</Link>
-//       </p>
-//       <p style={{ marginTop: 12 }}>
-//         <Link to="/forgot">{t("auth.forgot.title")}</Link>
-//       </p>
-//     </div>
-//   );
-// }
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { signinThunk } from "../features/auth/authThunks";
@@ -79,7 +24,7 @@ export default function Login() {
 
     if (signinThunk.fulfilled.match(r)) {
       toast.success(r.payload.message);
-      nav("/profile");
+      nav("/app/profile");
     } else {
       toast.error(r.payload?.message || t("common.error"));
     }

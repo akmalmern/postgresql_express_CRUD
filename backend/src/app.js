@@ -19,7 +19,15 @@ const app = express();
 app.use(requestId);
 app.use(language);
 // ✅ Security headers
-app.use(helmet());
+app.use(
+  helmet({
+    // ✅ Frontend boshqa origin bo‘lganda rasm/font/script bloklanmasin
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+
+    // (devda) ba'zan kerak bo‘ladi
+    crossOriginEmbedderPolicy: false,
+  }),
+);
 
 // ✅ JSON body
 app.use(express.json());

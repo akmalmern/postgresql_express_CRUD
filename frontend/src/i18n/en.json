@@ -16,6 +16,11 @@
     "signupHelp": "Create a new account",
     "haveAccount": "Already have an account?",
     "loginHelp": "Enter your credentials to continue",
+    "or": "OR",
+    "google": {
+      "failed": "Google login failed",
+      "noToken": "Google token not received"
+    },
     "forgot": {
       "title": "Forgot password?",
       "sendCode": "Send code",

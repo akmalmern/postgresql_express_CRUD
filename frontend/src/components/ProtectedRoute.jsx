@@ -1,11 +1,20 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-/**
- * ✅ Token bor bo‘lsa kiradi, yo‘q bo‘lsa login
- */
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ roles }) {
   const token = useSelector((s) => s.auth.accessToken);
-  if (!token) return <Navigate to="/login" replace />;
-  return children;
+  const role = useSelector((s) => s.auth.user?.role);
+  const location = useLocation();
+
+  // ✅ login bo‘lmagan user
+  if (!token) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  // ✅ role tekshiruv
+  if (roles?.length && role && !roles.includes(role)) {
+    return <Navigate to="/app/profile" replace />;
+  }
+
+  return <Outlet />;
 }

@@ -141,7 +141,7 @@ export default function Profile() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const profile = useSelector((s) => s.profile.profile);
-
+  console.log(profile.imagePath);
   const [form, setForm] = useState({ firstName: "", lastName: "", age: "" });
   const [saving, setSaving] = useState(false);
   const [avatarLoading, setAvatarLoading] = useState(false);
@@ -217,10 +217,7 @@ export default function Profile() {
             {t("nav.profile")}
           </h2>
 
-          <Link
-            to="/delete-account"
-            className="text-sm font-medium text-red-600 hover:underline"
-          >
+          <Link to="/app/delete-account" className="link">
             {t("auth.delete.title")}
           </Link>
         </div>
